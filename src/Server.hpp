@@ -1,14 +1,16 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 #include "VServer.hpp"
-#include "socks/VSocket.h"
-class Server: VServer {
+#include "socks/VSocket.hh"
+class Server: public VServer {
 
   public:
-		int start();
+		Server(int, int, const char*);
+		~Server();
+		int start(const char * address);
 		int handleClientConnection();
-
-	
+	private:
+		int holderPort;
 };
 
 #endif
