@@ -32,6 +32,7 @@
        int Bind( int );
        int sendMsg(const void*, size_t);
        int Listen(int = 1);
+       int Accept();
  // UDP methods
        size_t sendTo( const void *, size_t, void * );
        size_t recvFrom( void *, size_t, void * );
@@ -44,5 +45,6 @@
          
  };
  
+
  #endif // VSocket_h
  

@@ -24,7 +24,7 @@
 
 //#include <sys/types.h>
 */
-#include "VSocket.h"
+#include "VSocket.hh"
 
 
 /**
@@ -112,7 +112,7 @@ int VSocket::EstablishConnection( const char * hostip, int port ) {
 
   }
   if ( -1 == st ) {
-      throw std::runtime_error( "VSocket::EstablishConnection");
+     // throw std::runtime_error( "VSocket::EstablishConnection");
   }
   return st;
 
@@ -184,7 +184,7 @@ int VSocket::Bind( int port ) {
     struct sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
-    serverAddr.sin_addr.s_addr = htonl( INADDR_ANY );
+    inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
     memset(serverAddr.sin_zero, '\0', sizeof (serverAddr.sin_zero));
     
     st = bind(this->idSocket, (struct sockaddr*) &serverAddr, 
@@ -235,6 +235,24 @@ int VSocket::Listen(int connections)  {
     throw std::runtime_error( "VSocket::Listen" );
   }
   return st;
+}
+/**
+ *  Accept method
+ * 
+ *  accept connections after setting a listening port
+ *
+**/
+int VSocket::Accept() {
+  int newSock = -1;
+  struct sockaddr_in addr;
+  socklen_t addrLen = sizeof(addr);  
+
+  newSock = accept(this->idSocket, (struct sockaddr*)&addr, &addrLen); 
+  if (newSock == -1) {
+    std::cerr << "Acept failed: " << strerror(errno) << std::endl;
+    throw std::runtime_error( "VSocket::Acept" );
+  }
+  return newSock;
 }
 
 /**

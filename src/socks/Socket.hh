@@ -11,10 +11,10 @@
 *
 **/
 
-#ifndef Socket_h
-#define Socket_h
+#ifndef Socket_hh
+#define Socket_hh
 
-#include "VSocket.h"
+#include "VSocket.hh"
 
 class Socket : public VSocket {
 
