@@ -36,9 +36,9 @@ int Server::start(const char * address) {
 		printf("No holder seems to be active.\n");
 		// let server listen for holder msg
 		this->waitingSocket = new Socket('s');
-		
+
 		if (this->waitingSocket->Bind(this->waitingPort) == 0) {
-			
+
 			if (this->waitingSocket->Listen() == 0) {
 				printf("Listening for holder connections...\n");
 				int newSock = this->waitingSocket->Accept();
@@ -53,7 +53,7 @@ int Server::start(const char * address) {
 		}
 	}printf("Now accepting requests from holder\n");
 	while (1) {
-		
+
 	}
 
 }
