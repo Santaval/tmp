@@ -1,5 +1,3 @@
-# Aaron Josue Meza Torres B74787
-
 ## Instrucciones de compilación y ejecución
 
 Para compilarlo se debe escribir el siguiente comando:
