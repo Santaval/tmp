@@ -1,12 +1,10 @@
 procedure main() do 
-    shared buffer
-    shared holder_sem_start
-    shared server_sem_start
+    shared Buffer client_holder_buffer
+    shared Buffer holder_server_buffer
 
     shared client_request_sem
     shared client_response_sem
     shared mktp_request_sem
-    shared mktp_response_sem
     shared mktp_response_sem
 
     create_thread(holder)
@@ -18,18 +16,16 @@ end
 
 procedure client() do
     while (true) do
-        sendRequest()
+        sendRequest() // write on buffer
         signal(client_request_sem) // signal holder to start
         wait(client_response_sem) // wait for response
-            // do something
+            // print on console
         sleep(1000)
     end
 end
 
 
 procedure holder() do
-    start(holder_sem_start, server_sem_start)
-
     while (true) do 
         wait(client_request_sem) // wait client message
             holderProtocolManager(buffer)
@@ -47,17 +43,6 @@ procedure server() do
         signal(mktp_response_sem) // signal holder to start
     end
 end
-
-procedure start(mySmaphore, pairSemaphore) do
-    declare isPairOn = read(buffer, "S1") // false
-    write(buffer, "S1")
-    signal(pairSemaphore)
-    if not isPairOn then
-        // block until pair is done
-        wait(mySmaphore)
-        read(buffer, "S1") // true
-end
-
 
 
 declare CONNECTION_SIGNAL="s1"

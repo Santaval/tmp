@@ -6,11 +6,11 @@
 #include <condition_variable>
 #include <vector>
 
-class SharedBuffer {
+class Buffer {
 public:
     // Constructor/Destructor
-    SharedBuffer() = default;
-    ~SharedBuffer() = default;
+    Buffer() = default;
+    ~Buffer() = default;
 
     // Basic operations
     void write(const std::string& key, const std::string& value);
@@ -25,8 +25,8 @@ public:
                     const std::string& initialValue, 
                     const std::string& newValue);
 
-private:
-    std::map<std::string, std::string> data;
-    std::mutex mtx;
-    std::condition_variable cv;
+    private:
+        std::map<std::string, std::string> data;
+        std::mutex mtx;
+        std::condition_variable cv;
 };
