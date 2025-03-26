@@ -6,11 +6,11 @@
 #include <condition_variable>
 #include <vector>
 
-class SharedBuffer {
+class Buffer {
 public:
     // Constructor/Destructor
-    SharedBuffer() = default;
-    ~SharedBuffer() = default;
+    Buffer() = default;
+    ~Buffer() = default;
 
     // Basic operations
     void write(const std::string& key, const std::string& value);
