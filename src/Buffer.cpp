@@ -1,39 +1,39 @@
 #include "Buffer.hpp"
 
 // Writes a value to the buffer with a given key
-void SharedBuffer::write(const std::string& key, const std::string& value) {
+void Buffer::write(const std::string& key, const std::string& value) {
     std::lock_guard<std::mutex> lock(mtx);
     data[key] = value;
     cv.notify_all();
 }
 
 // Reads a value from the buffer with a given key
-std::string SharedBuffer::read(const std::string& key) {
+std::string Buffer::read(const std::string& key) {
     std::unique_lock<std::mutex> lock(mtx);
     cv.wait(lock, [this, key]{ return data.find(key) != data.end(); });
     return data[key];
 }
 
 // Checks if a key exists in the buffer (non-blocking)
-bool SharedBuffer::contains(const std::string& key) {
+bool Buffer::contains(const std::string& key) {
     std::lock_guard<std::mutex> lock(mtx);
     return data.find(key) != data.end();
 }
 
 // Removes a key from the buffer
-void SharedBuffer::remove(const std::string& key) {
+void Buffer::remove(const std::string& key) {
     std::lock_guard<std::mutex> lock(mtx);
     data.erase(key);
 }
 
 // Clears the entire buffer
-void SharedBuffer::clear() {
+void Buffer::clear() {
     std::lock_guard<std::mutex> lock(mtx);
     data.clear();
 }
 
 // Gets all keys in the buffer
-std::vector<std::string> SharedBuffer::getKeys() {
+std::vector<std::string> Buffer::getKeys() {
     std::lock_guard<std::mutex> lock(mtx);
     std::vector<std::string> keys;
     for (const auto& pair : data) {
@@ -43,7 +43,7 @@ std::vector<std::string> SharedBuffer::getKeys() {
 }
 
 // Special method for start procedure
-bool SharedBuffer::checkAndSet(const std::string& key, 
+bool Buffer::checkAndSet(const std::string& key, 
                               const std::string& initialValue, 
                               const std::string& newValue) {
     std::lock_guard<std::mutex> lock(mtx);

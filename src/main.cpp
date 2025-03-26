@@ -1,71 +1,49 @@
-#include <assert.h>
-#include <inttypes.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string>
-
-typedef struct shared_data {
-  std::string buffer;
-
-  sem_t* holder_sem_start;
-  sem_t* server_sem_start;
-
-  sem_t* client_request_sem; 
-  sem_t* client_response_sem;
-  sem_t* mktp_request_sem; 
-  sem_t* mktp_response_sem; 
-
-} shared_data_t;
-
-typedef struct private_data {
-  shared_data_t* shared_data;
-} private_data_t;
-
-
-void * client(void * data){
-  return NULL;
-}
-
-void * server(void * data){
-  return NULL;
-}
-
-void * holder(void * data){
-  return NULL; 
-}
+#include "Client.hpp"
+#include <iostream>
+#include "Holder.hpp"
+#include "Server.hpp"
 
 int main(){
   int error = EXIT_SUCCESS;
+  // init shared data
+  Buffer* client_holder_buffer = new Buffer();
+  Buffer* holder_server_buffer = new Buffer();
+  
+  sem_t* client_request_sem = new sem_t;
+  sem_t* client_response_sem = new sem_t;
+  sem_t* mktp_request_sem = new sem_t;
+  sem_t* mktp_response_sem = new sem_t; 
 
-  shared_data_t* shared_data = (shared_data_t*)calloc(1, sizeof(shared_data_t));
-  pthread_t* threads = (pthread_t*) malloc(3 * sizeof(pthread_t));
-  private_data_t* private_data = (private_data_t*) calloc(3, sizeof(private_data_t));
+  // init semaphores
+  error = sem_init(client_request_sem, /*pshared*/ 0, /*value*/ 0);
+  error = sem_init(client_response_sem, /*pshared*/ 0, /*value*/ 0);
+  error = sem_init(mktp_request_sem, /*pshared*/ 0, /*value*/ 0);
+  error = sem_init(mktp_response_sem, /*pshared*/ 0, /*value*/ 0);
 
-  if (shared_data) {
-    error = sem_init(shared_data->server_sem_start, /*pshared*/ 0, /*value*/ 0);
-    error = sem_init(shared_data->holder_sem_start, /*pshared*/ 0, /*value*/ 0);
-    error = sem_init(shared_data->mktp_request_sem, /*pshared*/ 0, /*value*/ 0);
-    error = sem_init(shared_data->mktp_response_sem, /*pshared*/ 0, /*value*/ 0);
-    error = sem_init(shared_data->client_request_sem, /*pshared*/ 0, /*value*/ 0);
-    error = sem_init(shared_data->client_response_sem, /*pshared*/ 0, /*value*/ 0);
-  }
 
-  error = pthread_create(&threads[0], /*attr*/ NULL, client, /*arg*/ &private_data[0]);
-  error = pthread_create(&threads[1], /*attr*/ NULL, server, /*arg*/ &private_data[1]);
-  error = pthread_create(&threads[2], /*attr*/ NULL, holder, /*arg*/ &private_data[2]);
+  Client client(client_holder_buffer, client_request_sem, client_response_sem);
+  Server server(holder_server_buffer, mktp_request_sem, mktp_response_sem);
+  Holder holder(client_holder_buffer, holder_server_buffer, client_request_sem, client_response_sem, mktp_request_sem, mktp_response_sem);
 
-  for (uint64_t thread_number = 0; thread_number < 3; ++thread_number) {
-    pthread_join(threads[thread_number], /*value_ptr*/ NULL);
-  }
+  // start threads
+  client.start();
+  holder.start();
+  server.start();
 
-  sem_destroy(shared_data->server_sem_start);
-  sem_destroy(shared_data->holder_sem_start);
-  sem_destroy(shared_data->mktp_request_sem);
-  sem_destroy(shared_data->mktp_response_sem);
-  sem_destroy(shared_data->client_request_sem);
-  sem_destroy(shared_data->client_response_sem);
+
+  // join threads
+  client.join();
+  server.join();
+  holder.join();
+
+  // destroy semaphores
+  error = sem_destroy(client_request_sem);
+  error = sem_destroy(client_response_sem);
+  error = sem_destroy(mktp_request_sem);
+  error = sem_destroy(mktp_response_sem);
+  
+
+  // destroy shared data
+  delete client_holder_buffer;
+  delete holder_server_buffer;
 }
