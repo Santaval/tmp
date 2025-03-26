@@ -25,8 +25,8 @@ public:
                     const std::string& initialValue, 
                     const std::string& newValue);
 
-private:
-    std::map<std::string, std::string> data;
-    std::mutex mtx;
-    std::condition_variable cv;
+    private:
+        std::map<std::string, std::string> data;
+        std::mutex mtx;
+        std::condition_variable cv;
 };
