@@ -39,6 +39,9 @@ int main(){
   // destroy semaphores
   error = sem_destroy(client_request_sem);
   error = sem_destroy(client_response_sem);
+  error = sem_destroy(mktp_request_sem);
+  error = sem_destroy(mktp_response_sem);
+  
 
   // destroy shared data
   delete client_holder_buffer;
