@@ -1,6 +1,6 @@
 #include "Client.hpp"
 #include <iostream>
-// #include "Holder.hpp"
+#include "Holder.hpp"
 // #include "Server.hpp"
 
 int main(){
@@ -23,18 +23,18 @@ int main(){
 
   Client client(client_holder_buffer, client_request_sem, client_response_sem);
   //Server server(holder_server_buffer, mktp_request_sem, mktp_response_sem);
-  //Holder holder(client_holder_buffer, holder_server_buffer, client_request_sem, client_response_sem, mktp_request_sem, mktp_response_sem);
+  Holder holder(client_holder_buffer, holder_server_buffer, client_request_sem, client_response_sem, mktp_request_sem, mktp_response_sem);
 
   // start threads
   client.start();
   // server.start();
-  // holder.start();
+  holder.start();
 
 
   // join threads
   client.join();
   // server.join();
-  // holder.join();
+  holder.join();
 
   // destroy semaphores
   error = sem_destroy(client_request_sem);
