@@ -1,6 +1,8 @@
 
 #pragma once
 #include "Thread.hpp"
+#include "Buffer.hpp"
+#include <semaphore.h>
 
 class Server: public Thread {
   private:
