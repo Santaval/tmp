@@ -7,7 +7,9 @@ void Buffer::write(const std::string& key, const std::string& value) {
 
 // Reads a value from the buffer with a given key
 std::string Buffer::read(const std::string& key) {
-    return data[key];
+    std::string value = this->data[key];
+    this->clear();
+    return value;
 }
 
 // Checks if a key exists in the buffer (non-blocking)
@@ -25,17 +27,7 @@ void Buffer::clear() {
     data.clear();
 }
 
-// Gets all keys in the buffer
-std::vector<std::string> Buffer::splitValue(const std::string& key, char del) {
-    std::vector<std::string> keys;
-    // Create a stringstream object to value of buffer
-    std::stringstream ss(this->data[key]);
-	std::string token;
-   	// Splitting the str string by delimiter
-    while (getline(ss, token, del))
-        keys.push_back(token);
-    return keys;
-}
+
 
 // Special method for start procedure
 bool Buffer::checkAndSet(const std::string& key, 

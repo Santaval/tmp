@@ -25,6 +25,6 @@ class Holder: public Thread {
     int run() override;
     int manageClientRequest();
     int manageServerResponse();
-    int sendMKTP();
+    int sendMKTP(std::string content);
     int answerHTTP();
 };
