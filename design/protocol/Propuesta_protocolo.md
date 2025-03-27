@@ -25,18 +25,4 @@ El servidor, como no tiene comunicación directa con el cliente, solo envía men
 ### Tenedor
 El tenedor podrá acceder a buscar lo solicitado en los servidores disponibles, enviando estos mensajes:
 * **ALL**: Si recibió ALL del cliente, el tenedor jalará el directorio del servidor actual para mostrarle después la lista de archivos disponibles al cliente.
-* **ONE [_file.txt_]**: Solicitar directamente un archivo .txt específico. Aquí, se retornaría el contenido entero del archivo pedido. El formato que se esperaría a partir de esta bandera sería ONE archivo.txt. Si no se especifica el nombre del archivo, podría descartarse la solicitud, o bien, retornar el primer archivo hallado en el directorio por defecto.
-
-Se muestran casos potenciales de solicitudes de cliente:
-**1)** Solicitud de lista
-![](img/all.png)
-
-**2)** Solicitud de archivo
-![](img/one.png)
-
-
-**3)** Solicitud no hallada
-![](img/none.png)
-
-**4)** Pedido inválido
-![](img/error.png)
+* **ONE [_file.txt_]**: Solicitar directamente un archivo .txt específico. Aquí, se retornaría el contenido entero del archivo pedido. El formato que se esperaría a partir de esta bandera sería ONE archivo.txt.
