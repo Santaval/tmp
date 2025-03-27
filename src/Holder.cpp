@@ -4,27 +4,24 @@
 #include <string.h>
 
 int Holder::run() {
-    std::cout << "Holder ----- waiting for client request" << std::endl;
-    sem_wait(client_request_sem);
-    std::cout << "Holder ----- received client request" << std::endl;
-
-    if (this->manageClientRequest() == -1) {
-        return -1;
-    }
-    this->sendMKTP();
-    std::cout << "Holder ----- Send request to server" << std::endl;
-    sem_post(mktp_request_sem);
-    std::cout << "Holder ----- waiting for response from server" << std::endl;
-    sem_wait(mktp_response_sem);
-    std::cout << "Holder ----- received response from server" << std::endl;
+    while (true) {
+        sem_wait(client_request_sem);
     
-    if (this->manageServerResponse() == -1) {
-        return -1;
+        if (this->manageClientRequest() == -1) {
+            return -1;
+        }
+        this->sendMKTP();
+        sem_post(mktp_request_sem);
+        sem_wait(mktp_response_sem);
+        
+        if (this->manageServerResponse() == -1) {
+            return -1;
+        }
+        this->answerHTTP();
+        sem_post(client_response_sem);
+        return 0;
     }
-    this->answerHTTP();
-    sem_post(client_response_sem);
-    std::cout << "Holder ----- sent response to client" << std::endl;
-    return 0;
+    
 }
 int Holder::manageClientRequest() {
     std::cout << "[+] Client: "<< this->client_holder_buffer->read("GET") << std::endl;
