@@ -46,4 +46,6 @@ int main(){
   // destroy shared data
   delete client_holder_buffer;
   delete holder_server_buffer;
+  
+  return error;
 }
