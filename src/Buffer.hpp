@@ -63,13 +63,6 @@ public:
      * @brief Clears the contents of the buffer, resetting it to an empty state.
      */
     void clear();
-    /**
-     * @brief Splits the value of given key by the given delimiter
-     * @param key The jey associated to the value to split
-     * @param del The delimitator with which the splitting will be donde
-     * @return a vector of type string of the tokens found
-     */
-    std::vector<std::string> splitValue(const std::string& key, char del);
 
     // Special operations
     /**

@@ -37,8 +37,6 @@ class Holder: public Thread {
     int manageClientRequest();
     /// @brief Receives the server's response and sends the answer to the client.
     int manageServerResponse();
-    /// @brief Sends to the server the request in the MKTP protocol
-    int sendMKTP();
-    /// @brief Sends to the client the response in the HTTP protocol
+    int sendMKTP(std::string content);
     int answerHTTP();
 };

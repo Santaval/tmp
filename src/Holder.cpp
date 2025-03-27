@@ -2,15 +2,17 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "utils.hpp"
 
 int Holder::run() {
     while (true) {
+        std::cout << "HOlder is waiting" << std::endl;
+
         sem_wait(client_request_sem);
     
         if (this->manageClientRequest() == -1) {
             return -1;
         }
-        this->sendMKTP();
         sem_post(mktp_request_sem);
         sem_wait(mktp_response_sem);
         
@@ -19,12 +21,11 @@ int Holder::run() {
         }
         this->answerHTTP();
         sem_post(client_response_sem);
-        return 0;
     }
+    return 0;
     
 }
 int Holder::manageClientRequest() {
-    std::cout << "[+] Client: "<< this->client_holder_buffer->read("GET") << std::endl;
     if (!this->client_holder_buffer->contains("GET")) {
         std::cout << "Holder::manageRequest - Invalid http method"<< std::endl;
         return -1;
@@ -34,14 +35,13 @@ int Holder::manageClientRequest() {
          std::cout << "Holder::manageRequest - Not directory specified"<< std::endl;
         return -1;
     }
+    this->sendMKTP(content);
     return 0;
 }
-int Holder::sendMKTP() {
-    std::string content = this->client_holder_buffer->read("GET");
-    std::cout << "Content: " << content << std::endl;
-    std::vector <std::string> tokens = this->client_holder_buffer->splitValue("GET", '/');
-    if(tokens.size() >= 2) { // a specific file was attached
-        this->holder_server_buffer->write("ONE", content);
+int Holder::sendMKTP(std::string content) {
+    std::vector <std::string> tokens = splitValue(content, '/');
+    if(tokens.size() >= 3) { // a specific file was attached
+        this->holder_server_buffer->write("ONE", tokens[2]);
     } else { // asked for directory
         this->holder_server_buffer->write("ALL", content);
     }
@@ -64,14 +64,16 @@ int Holder::answerHTTP() {
     if (this->holder_server_buffer->contains("ONE")) {
         key = "ONE";
     }
-    tokens = this->holder_server_buffer->splitValue(key, ' '); // ALL 0 NF --- ALL 1 [content]
+    response = this->holder_server_buffer->read(key);
+    tokens = splitValue(response, ' '); // ALL 0 NF --- ALL 1 [content]
+
     if (tokens[0] == "0") {
         if (tokens[1]== "NF") response = "File Not Found";
         if (tokens[1]== "SE") response = "Server Error";
         if (tokens[1]== "BR") response = "Bad Request";
         
     } else if (tokens[0] == "1") {
-        response = this->holder_server_buffer->read(key);
+        response = tokens[1];
     }
     else {
         std::cout << "Holder::answerHTTP -- Unexpected server answer\n";
