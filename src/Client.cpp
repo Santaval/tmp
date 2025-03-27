@@ -6,7 +6,8 @@
 
 // should come with an arg for testing
 int Client::run() {
-    while (true) {
+    bool connected = true;
+    while (connected) {
         std::string input;
         std::cout << "[*] Enter HTTP command: ";
         std::cin >> input;

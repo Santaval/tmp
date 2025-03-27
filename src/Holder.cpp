@@ -5,7 +5,8 @@
 #include "utils.hpp"
 
 int Holder::run() {
-    while (true) {
+    bool connected = true;
+    while (connected) {
         sem_wait(client_request_sem);
         std::cout << "[-] Holder: recieved request from Client: ";
         if (this->manageClientRequest() != -1) {
@@ -16,7 +17,7 @@ int Holder::run() {
             if (this->manageServerResponse() == -1) {
                 return -1;
             }
-            this->answerHTTP();           
+            this->answerHTTP();
         }
         std::cout << "[-] Holder: response sent to Client" << std::endl;
         sem_post(client_response_sem); 
@@ -31,14 +32,14 @@ int Holder::manageClientRequest() {
         return -1;
     }
     std::string content = this->client_holder_buffer->read("GET");
-    if(content.length() < 2) { // an empty request was sent
+    if(content.length() < 9) { // an empty request was sent
         std::cout << "[-] Holder::manageRequest - Not directory specified"<< std::endl;
         this->client_holder_buffer->write("GET", "Bad Request");
         return -1;
     }
     std::cout << content << std::endl;
-    this->sendMKTP(content);
-    return 0;
+    return this->sendMKTP(content);
+   // return 0;
 }
 int Holder::sendMKTP(std::string content) {
     std::vector <std::string> tokens = splitValue(content, '/');

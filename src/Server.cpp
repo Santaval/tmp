@@ -4,11 +4,12 @@
 
 int Server::run()
 {
-    while (true)
+    bool connected = true;
+    while (connected)
     {
         sem_wait(mktp_request_sem);
         std::cout << "[+] Server: recieved request from Holder: ";
-        this->answerMKTP();
+        if (this->answerMKTP() == -1) connected = false;
         std::cout << "[+] Server: response sent to Holder" << std::endl;
         sem_post(mktp_response_sem);
     }
@@ -19,7 +20,6 @@ int Server::answerMKTP()
 {
     std::string response;
     std::string key = "ALL";
-
     if (this->holder_server_buffer->contains("ONE"))
     {
         key = "ONE";
