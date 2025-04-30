@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "utils.hpp"
+#include <regex>
 
 int Holder::run() {
     bool connected = true;
@@ -25,63 +26,82 @@ int Holder::run() {
     return 0;
     
 }
+
 int Holder::manageClientRequest() {
-    if (!this->client_holder_buffer->contains("GET")) {
-        std::cout << "[-] Holder::manageRequest - Invalid http method"<< std::endl;
-        this->client_holder_buffer->write("GET", "Bad Request");
+    std::string raw = this->client_holder_buffer->read();
+
+    std::smatch match;
+    std::regex getRegex(R"(BEGIN/GET/([^/]+)/END)");
+
+    if (!std::regex_match(raw, match, getRegex)) {
+        std::cout << "[-] Holder::manageclientRequest - Formato invalido" << std::endl;
+        this->client_holder_buffer->write("BEGIN/ERROR/300/Formato de mensaje inválido/END");
         return -1;
     }
-    std::string content = this->client_holder_buffer->read("GET");
-    if(content.length() < 9) { // an empty request was sent
-        std::cout << "[-] Holder::manageRequest - Not directory specified"<< std::endl;
-        this->client_holder_buffer->write("GET", "Bad Request");
+
+    std::string resource = match[1];
+    if (resource.empty()) {
+        std::cout << "[-] Holder::manageclientRequest - Recurso vacio" << std::endl;
+        this->client_holder_buffer->write("BEGIN/ERROR/200/Recurso no especificado/END");
         return -1;
     }
-    std::cout << content << std::endl;
-    return this->sendMKTP(content);
+
+    return this->sendMKTP(resource);
    // return 0;
 }
-int Holder::sendMKTP(std::string content) {
-    std::vector <std::string> tokens = splitValue(content, '/');
-    if(tokens.size() >= 3) { // a specific file was attached
-        this->holder_server_buffer->write("ONE", tokens[2]);
-    } else { // asked for directory
-        this->holder_server_buffer->write("ALL", content);
-    }
-    return 0;
-}
-int Holder::manageServerResponse() {
-    std::string key;
-    if (this->holder_server_buffer->contains("ALL") ||
-     this->holder_server_buffer->contains("ONE")) {
-        return 0;
-    } else {
-        return -1;
-    }
-    
-}
-int Holder::answerHTTP() {
-    std::string response;
-    std::vector <std::string> tokens;
-    std::string key = "ALL";
-    if (this->holder_server_buffer->contains("ONE")) {
-        key = "ONE";
-    }
-    response = this->holder_server_buffer->read(key);
-    tokens = splitValue(response, ' ');
 
-    if (tokens[0] == "0") {
-        if (tokens[1]== "NF") response = "[*] File Not Found";
-        if (tokens[1]== "SE") response = "[*] Server Error";
-        if (tokens[1]== "BR") response = "[*] Bad Request";
-        
-    } else if (tokens[0] == "1") {
-        response = tokens[1];
+int Holder::sendMKTP(std::string resource) {
+    if (resource == "ALL") {
+        this->holder_server_buffer->write("BEGIN/OBJECTS/END");
+    } else {
+        this->holder_server_buffer->write("BEGIN/GET/" + resource + "/END");
     }
-    else {
-        std::cout << "[-] Holder: Unexpected server answer\n";
-        return -1;
-    }
-    this->client_holder_buffer->write("GET", response);
+
     return 0;
+}
+
+int Holder::manageServerResponse() {
+    std::string raw = this->holder_server_buffer->read();
+
+    if (raw.rfind("BEGIN/OK/", 0) == 0) {
+        std:: string data = raw.substr(9, raw.size() - 13);
+        this->lastServerCode = 1;
+        this->lastServerMessage = data;
+        return 0;
+    }
+
+    std::smatch match;
+    std::regex errorRegex(R"(BEGIN/ERROR/(\d{3})/([^/]+)/END)");
+
+    if (std::regex_match(raw, match, errorRegex)) {
+        std::string errorCode = match[1];
+        std::string errorMessage = match[2];
+        this->lastServerCode = std::stoi(errorCode);
+        this->lastServerMessage = errorMessage;
+        return 0;
+    }
+
+    std::cout << "[-] Holder::manageServerResponse - Respuesta inesperada del servidor" << std::endl;
+    return -1;
+}
+
+int Holder::answerHTTP() {
+    if (lastServerCode == 1) {
+        this->client_holder_buffer->write("BEGIN/OK/" + lastServerMessage + "/END");
+    } else {
+        this->client_holder_buffer->write("BEGIN/ERROR/" + std::to_string(lastServerCode) + "/" + lastServerMessage + "/END");
+    }
+    return 0;
+
+}
+
+void Holder::listenToDiscovery(Buffer* discovery_buffer) {
+    while (true) {
+        std::string msg = discovery_buffer->read("DISCOVERY");
+        if (msg == "BEGIN/ON/SERVIDOR/END") {
+            serverAvailable = true;
+        } else if (msg == "BEGIN/OFF/SERVIDOR/END") {
+            serverAvailable = false;
+        }
+    }
 }

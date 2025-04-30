@@ -19,6 +19,11 @@ class Holder: public Thread {
     sem_t* mktp_request_sem;
     /// @brief Semaphore to wait for receiving a response
     sem_t* mktp_response_sem;
+
+    bool serverAvailable;
+    int lastServerCode;
+    std::string lastServerMessage;
+
   public:
     /// @brief Constructor
     Holder(Buffer* client_holder_buffer, Buffer* holder_server_buffer, sem_t* client_request_sem, sem_t* client_response_sem, sem_t* mktp_request_sem, sem_t* mktp_response_sem) :
@@ -37,6 +42,7 @@ class Holder: public Thread {
     int manageClientRequest();
     /// @brief Receives the server's response and sends the answer to the client.
     int manageServerResponse();
-    int sendMKTP(std::string content);
+    int sendMKTP(std::string resource);
     int answerHTTP();
+    void listenToDiscovery(Buffer* discovery_buffer);
 };
