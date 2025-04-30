@@ -27,7 +27,7 @@ Server::~Server() {
 }
 
 int Server::answerMKTP() {
-    std::string raw = this->holder_server_buffer->read();
+    std::string raw = this->holder_server_buffer->read("SERVER_REQUEST");
     std::string response;
 
     std::smatch match;
@@ -54,7 +54,7 @@ int Server::answerMKTP() {
         response = "BEGIN/ERROR/300/Formato de mensaje inválido/END";
     }
 
-    this->holder_server_buffer->write(response);
+    this->holder_server_buffer->write("SERVER_RESPONSE", response);
     return 0;
 }
 
