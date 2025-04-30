@@ -7,6 +7,7 @@
 class Server: public Thread {
   private:
     Buffer* holder_server_buffer;
+    Buffer* discovery_buffer;
     sem_t* mktp_request_sem;
     sem_t* mktp_response_sem;
     std::string image;
@@ -20,4 +21,5 @@ class Server: public Thread {
     ~Server() = default;
     int run() override;
     int answerMKTP();
+    void startDiscovery(Buffer* discovery_buffer);
 };
