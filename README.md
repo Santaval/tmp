@@ -7,7 +7,7 @@
 * Aarón Santana C27373
 
 ## Sistema de archivos distribuido (pirofs® para aArt)
-* Para este proyecto, se propone una conexión de un cliente y servidor a través de un intermediario, que se denominará Tenedor (o Holder). Este recibe en formato HTTP el pedido del cliente, y seguidamente le transfiere la solicitud al Servidor por medio del protocolo propuesto por el equipo, MKTP (Mouse Ke Tool Protocol). Las especificaciones de este protocolo se pueden encontrar en la carpeta de /design. 
+* Para este proyecto, se propone una conexión de un cliente y servidor a través de un intermediario, que se denominará Tenedor (o Holder). Este recibe en formato HTTP el pedido del cliente, y seguidamente le transfiere la solicitud al Servidor por medio del protocolo propuesto por grupo 1 de PI, PIGP (PI Group Protocol). Las especificaciones de este protocolo se pueden encontrar en la carpeta de /design. 
 
 
 ## Compilación
