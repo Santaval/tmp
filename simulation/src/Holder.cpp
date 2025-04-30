@@ -46,11 +46,11 @@ int Holder::manageClientRequest() {
         return -1;
     }
 
-    return this->sendMKTP(resource);
+    return this->sendPIGP(resource);
    // return 0;
 }
 
-int Holder::sendMKTP(std::string resource) {
+int Holder::sendPIGP(std::string resource) {
     if (resource == "ALL") {
         this->holder_server_buffer->write("SERVER_REQUEST", "BEGIN/OBJECTS/END");
     } else {

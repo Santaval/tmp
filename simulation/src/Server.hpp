@@ -20,6 +20,6 @@ class Server: public Thread {
       holder_server_buffer(holder_server_buffer), mktp_request_sem(mktp_request_sem), mktp_response_sem(mktp_response_sem) {};
     ~Server() = default;
     int run() override;
-    int answerMKTP();
+    int answerPIGP(); // PIGP = PI Group Protocol
     void startDiscovery(Buffer* discovery_buffer);
 };

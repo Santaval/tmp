@@ -15,7 +15,7 @@ int Server::run()
     {
         sem_wait(mktp_request_sem);
         std::cout << "[+] Server: recieved request from Holder: ";
-        if (this->answerMKTP() == -1) connected = false;
+        if (this->answerPIGP() == -1) connected = false;
         std::cout << "[+] Server: response sent to Holder" << std::endl;
         sem_post(mktp_response_sem);
     }
@@ -26,7 +26,7 @@ Server::~Server() {
     discovery_buffer->write("Discovery", "BEGIN/OFF/SERVIDOR/END");
 }
 
-int Server::answerMKTP() {
+int Server::answerPIGP() {
     std::string raw = this->holder_server_buffer->read("SERVER_REQUEST");
     std::string response;
 
@@ -60,7 +60,7 @@ int Server::answerMKTP() {
 
 void Server::startDiscovery(Buffer* discovery_buffer) {
     while (true) {
-        discovery_buffer->write("Discovery", "BEGIN/ON/SERVIDOR/END");
+        discovery_buffer->write("DISCOVERY", "BEGIN/ON/SERVIDOR/END");
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }

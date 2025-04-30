@@ -42,7 +42,7 @@ class Holder: public Thread {
     int manageClientRequest();
     /// @brief Receives the server's response and sends the answer to the client.
     int manageServerResponse();
-    int sendMKTP(std::string resource);
+    int sendPIGP(std::string resource); // PIGP = PI Group Protocol
     int answerHTTP();
     void listenToDiscovery(Buffer* discovery_buffer);
 };
