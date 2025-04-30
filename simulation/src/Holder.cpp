@@ -28,21 +28,21 @@ int Holder::run() {
 }
 
 int Holder::manageClientRequest() {
-    std::string raw = this->client_holder_buffer->read();
+    std::string raw = this->client_holder_buffer->read("CLIENT_REQUEST");"";
 
     std::smatch match;
     std::regex getRegex(R"(BEGIN/GET/([^/]+)/END)");
 
     if (!std::regex_match(raw, match, getRegex)) {
         std::cout << "[-] Holder::manageclientRequest - Formato invalido" << std::endl;
-        this->client_holder_buffer->write("BEGIN/ERROR/300/Formato de mensaje inválido/END");
+        this->client_holder_buffer->write("CLIENT_RESPONSE","BEGIN/ERROR/300/Formato de mensaje inválido/END");
         return -1;
     }
 
     std::string resource = match[1];
     if (resource.empty()) {
         std::cout << "[-] Holder::manageclientRequest - Recurso vacio" << std::endl;
-        this->client_holder_buffer->write("BEGIN/ERROR/200/Recurso no especificado/END");
+        this->client_holder_buffer->write("CLIENT_RESPONSE", "BEGIN/ERROR/200/Recurso no especificado/END");
         return -1;
     }
 
@@ -52,16 +52,16 @@ int Holder::manageClientRequest() {
 
 int Holder::sendMKTP(std::string resource) {
     if (resource == "ALL") {
-        this->holder_server_buffer->write("BEGIN/OBJECTS/END");
+        this->holder_server_buffer->write("SERVER_REQUEST", "BEGIN/OBJECTS/END");
     } else {
-        this->holder_server_buffer->write("BEGIN/GET/" + resource + "/END");
+        this->holder_server_buffer->write("SERVER_REQUEST", "BEGIN/GET/" + resource + "/END");
     }
 
     return 0;
 }
 
 int Holder::manageServerResponse() {
-    std::string raw = this->holder_server_buffer->read();
+    std::string raw = this->holder_server_buffer->read("SERVER_RESPONSE");
 
     if (raw.rfind("BEGIN/OK/", 0) == 0) {
         std:: string data = raw.substr(9, raw.size() - 13);
@@ -87,12 +87,11 @@ int Holder::manageServerResponse() {
 
 int Holder::answerHTTP() {
     if (lastServerCode == 1) {
-        this->client_holder_buffer->write("BEGIN/OK/" + lastServerMessage + "/END");
+        this->client_holder_buffer->write("CLIENT_RESPONSE", "BEGIN/OK/" + lastServerMessage + "/END");
     } else {
-        this->client_holder_buffer->write("BEGIN/ERROR/" + std::to_string(lastServerCode) + "/" + lastServerMessage + "/END");
+        this->client_holder_buffer->write("CLIENT_RESPONSE", "BEGIN/ERROR/" + std::to_string(lastServerCode) + "/" + lastServerMessage + "/END");
     }
     return 0;
-
 }
 
 void Holder::listenToDiscovery(Buffer* discovery_buffer) {
