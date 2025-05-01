@@ -50,10 +50,10 @@ int Server::start(const char * address) {
 		return -1;
 	}
 	// prepare port to listen for connections
-	if (this->initSocket->Bind(this->clientPort, address) == 0) {
+	if (this->initSocket->Bind(this->clientPort, "0.0.0.0") == 0) {
 
 		if (this->initSocket->MarkPassive() == 0) {
-			std::cout << "[+] Listening for client connections...\n";
+			std::cout << "[+] Server listening on 0.0.0.0:" << this->clientPort << "\n";
 
 			while (true) {	// loop for clients connections
 				VSocket* newSock = this->initSocket->AcceptConnection(&this->clientAddr);
@@ -61,7 +61,7 @@ int Server::start(const char * address) {
 					return -1;
 				}
 
-				printf("[+] New client connected from %s:\n", 
+				printf("[+] New client connected from %s\n", 
 				inet_ntoa(this->clientAddr.sin_addr));
 
 				// set a child process to handle the incoming request
