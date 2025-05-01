@@ -5,6 +5,7 @@
 #include "sockets/VSocket.hh"
 #include "sockets/SSLSocket.hh"
 #include "sockets/SSLSocket.hh"
+#include "file_system/include/FileSystem.hpp"
 class Server: public VServer {
 
   public:
@@ -33,7 +34,9 @@ class Server: public VServer {
 		int handleClientConnection(char buffer[256], VSocket* socket);
 
 	private:
+
 		struct sockaddr_in clientAddr;
+		FileSystem* fs;
 		int clientPort;
 };
 

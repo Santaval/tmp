@@ -10,6 +10,7 @@ FileSystem::FileSystem(const std::string& fileName)
         , bitmap(&file), dir(&file, &bitmap){
   try {
       // Try building new filesystem if loading fails
+      this->bitmap.buildBitmap();
       if (this->bitmap.loadBitMap() != 0) {
           std::cerr << "Info: Creating new filesystem\n";
           if (this->buildFileSystem() != 0) {
@@ -22,6 +23,7 @@ FileSystem::FileSystem(const std::string& fileName)
       throw std::runtime_error(std::string("Filesystem initialization failed: ") + e.what());
   }
 }
+
 
 FileSystem::~FileSystem() {
 }
