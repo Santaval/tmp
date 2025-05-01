@@ -8,8 +8,6 @@ int Server::run()
 {
     bool connected = true;
 
-    std::thread  discoveryThread(&Server::startDiscovery, this, discovery_buffer);
-    discoveryThread.detach();
 
     while (connected)
     {
@@ -22,9 +20,7 @@ int Server::run()
     return 0;
 }
 
-Server::~Server() {
-    discovery_buffer->write("Discovery", "BEGIN/OFF/SERVIDOR/END");
-}
+
 
 int Server::answerPIGP() {
     std::string raw = this->holder_server_buffer->read("SERVER_REQUEST");
@@ -33,7 +29,7 @@ int Server::answerPIGP() {
     std::smatch match;
     std::regex getRegex(R"(BEGIN/GET/([^/]+)/END)");
 
-    if (raw == "BEGIN/OBJECTS/END") {
+    if (raw == "BEGIN/GET/OBJECTS/END") {
         // Formato compatible con holder
         response = "BEGIN/OK/asthetic.txt\nchillGuy.txt\nlakshmi.txt\nMichaelMouse.txt\nvalorant.txt/END";
     } 
@@ -46,7 +42,8 @@ int Server::answerPIGP() {
                             std::istreambuf_iterator<char>());
             file.close();
             response = "BEGIN/OK/" + content + "/END";
-        } else {
+        } else {    //std::thread  discoveryThread(&Server::startDiscovery, this, discovery_buffer);
+            //discoveryThread.detach();
             response = "BEGIN/ERROR/201/Archivo no encontrado/END";
         }
     }
@@ -58,9 +55,4 @@ int Server::answerPIGP() {
     return 0;
 }
 
-void Server::startDiscovery(Buffer* discovery_buffer) {
-    while (true) {
-        discovery_buffer->write("DISCOVERY", "BEGIN/ON/SERVIDOR/END");
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-    }
-}
+

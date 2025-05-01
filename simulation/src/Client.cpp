@@ -8,17 +8,16 @@
 int Client::run() {
     bool connected = true;
     while (connected) {
-        std::string input;
+        std::string input = "/resources";
         std::cout << "[*] Enter HTTP command: ";
         std::cin >> input;
         std::string request = "BEGIN/GET/" + input + "/END";
         this->sendHTTP(request.c_str());
         sem_post(this->client_request_sem);
         sem_wait(this->client_response_sem);
-        this->manageResponse();
+        //this->manageResponse();
         if (this->manageResponse() == -1) {
             std::cout << "[*] Client: Error in response" << std::endl;
-            connected = false;
         } else {
             std::cout << "[*] Client: Response received" << std::endl;
         }
@@ -42,7 +41,7 @@ int Client::manageResponse() {
 
     if (response.rfind("BEGIN/OK/", 0) == 0) {
         std::string content = response.substr(9, response.size() - 13);
-        std::cout << "[*] Client: Response OK" << std::endl;
+        std::cout << "[*] Client: Response OK \n" << content << std::endl;
         
     } else if (response.rfind("BEGIN/ERROR/", 0) == 0) {
        size_t codePos = 12;

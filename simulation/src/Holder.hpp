@@ -7,6 +7,7 @@
 /// @brief A holder to act as an intermediary between the client and the server
 class Holder: public Thread {
   private:
+    
     /// @brief Buffer to communicate with the client
     Buffer* client_holder_buffer;
     /// @brief Buffer to communicate with the server
@@ -26,7 +27,7 @@ class Holder: public Thread {
 
   public:
     /// @brief Constructor
-    Holder(Buffer* client_holder_buffer, Buffer* holder_server_buffer, sem_t* client_request_sem, sem_t* client_response_sem, sem_t* mktp_request_sem, sem_t* mktp_response_sem) :
+    Holder(Buffer* client_holder_buffer, Buffer* holder_server_buffer,sem_t* client_request_sem, sem_t* client_response_sem, sem_t* mktp_request_sem, sem_t* mktp_response_sem) :
       client_holder_buffer(client_holder_buffer),
       holder_server_buffer(holder_server_buffer),
       client_request_sem(client_request_sem),
