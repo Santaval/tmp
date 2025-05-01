@@ -1,0 +1,9 @@
+## Diseño en Cisco Packet Tracer
+
+Para este avance, se propone una simulación en Cisco Packet Tracer de transferencia de mensajes con VLANs, ahora a través de un dispositivo de capa 3, en este caso, un switch multicapa (cuyas funcionalidades son similares a las de un router). El switch multicapa, a diferencia de un switch de capa 2, es capaz de ejecutar la función de _ip routing_ y así redireccionar paquetes a través de la red. 
+
+En la simulación, se reproducen dos islas de computadoras, una conectada a VLAN 110 y la otra, a VLAN 120. Estas PCs se conectan a un switch de capa 2 por los puertos con la VLAN respectiva activada (alguno de los FastEthernet0 del rango 1-12). Por su parte, cada switch se conecta al switch multicapa central por medio de un puerto truncado; en esta ocasión, se elige el FastEthernet0/24 para ambas islas. Truncar el puerto le permite a los switches transferir paquetes por medio de distintas VLANs sin generar conflicto. En este caso, se habilita recibir de la de 110 o 120. 
+
+Ahora bien, se agregó además una VLAN 99 para manejar las otras VLANs desde el switch central. Los tres switches reconocen esta VLAN y se les señalizó una dirección IP 172.17.99.x. En el switch multicapa, los puertos FastEthernet 1 y 2 son los que reciben, respectivamente, las conexiones del switch 0 y el switch 1. La Default Gateway de las PCs debe ser la dirección IP de la VLAN asignada, reconocida en el switch central.
+
+De esta manera, la isla de VLAN 110 puede enviar mensajes a la isla de VLAN 120 y viceversa. Por compartir una IP coincidente, las PCs de una misma isla también pueden enviarse mensajes, pero para efectos de esta simulación esto no es significativo (es más, en caso real, podría decirse que no pueden comunicarse, pues sería comunicación entre mismos clientes). 

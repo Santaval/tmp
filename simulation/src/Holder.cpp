@@ -7,6 +7,7 @@
 
 int Holder::run() {
     bool connected = true;
+
     while (connected) {
         sem_wait(client_request_sem);
         std::cout << "[-] Holder: recieved request from Client: ";
@@ -28,7 +29,7 @@ int Holder::run() {
 }
 
 int Holder::manageClientRequest() {
-    std::string raw = this->client_holder_buffer->read("CLIENT_REQUEST");"";
+    std::string raw = this->client_holder_buffer->read("CLIENT_REQUEST");
 
     std::smatch match;
     std::regex getRegex(R"(BEGIN/GET/([^/]+)/END)");
@@ -40,6 +41,7 @@ int Holder::manageClientRequest() {
     }
 
     std::string resource = match[1];
+ 
     if (resource.empty()) {
         std::cout << "[-] Holder::manageclientRequest - Recurso vacio" << std::endl;
         this->client_holder_buffer->write("CLIENT_RESPONSE", "BEGIN/ERROR/200/Recurso no especificado/END");
@@ -94,13 +96,4 @@ int Holder::answerHTTP() {
     return 0;
 }
 
-void Holder::listenToDiscovery(Buffer* discovery_buffer) {
-    while (true) {
-        std::string msg = discovery_buffer->read("DISCOVERY");
-        if (msg == "BEGIN/ON/SERVIDOR/END") {
-            serverAvailable = true;
-        } else if (msg == "BEGIN/OFF/SERVIDOR/END") {
-            serverAvailable = false;
-        }
-    }
-}
+
