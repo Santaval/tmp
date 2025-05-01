@@ -4,8 +4,8 @@
 #include "VServer.hpp"
 #include "sockets/VSocket.hpp"
 #include "sockets/SSLSocket.hpp"
-#include "sockets/SSLSocket.hpp"
-// #include "file_system/include/FileSystem.hpp"
+#include "FileSystem.hpp"
+
 class Server: public VServer {
 
   public:
@@ -34,9 +34,8 @@ class Server: public VServer {
 		int handleClientConnection(char buffer[256], VSocket* socket);
 
 	private:
-
 		struct sockaddr_in clientAddr;
-		// FileSystem* fs;
+		FileSystem* fs;
 		int clientPort;
 };
 

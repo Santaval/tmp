@@ -10,7 +10,7 @@
 Server::Server(int clientPort, const char* ip) {
 	this->clientPort = clientPort; // 5051
 	this->myAddress = ip;
-	// this->fs = new FileSystem();
+	this->fs = new FileSystem("./disk.bin");
 	memset( &this->clientAddr, 0, sizeof( this->clientAddr ) );
 	this->clientAddr.sin_family = AF_INET;
 	this->clientAddr.sin_port = htons(this->clientPort);
