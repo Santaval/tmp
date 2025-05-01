@@ -37,6 +37,10 @@ class FileSystem {
   /// @param name The name of the file to be deleted
   /// @return retuns 0 on success.
   int deleteFile(std::string name);
+  /// @brief Loads all .txt files from a specified directory into the file system
+  /// @param directoryPath The path to the directory containing .txt files
+  /// @return returns 0 on success, -1 on failure
+  int loadFilesFromDirectory(const std::string& directoryPath);
 
  private:
   /// @brief Used to write and read blocks from the file
