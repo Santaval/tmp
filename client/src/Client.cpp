@@ -57,16 +57,41 @@ std::string Client::readHttpResponse() {
     std::string response;
     char buffer[4096];
     size_t bytesRead;
+    bool headersComplete = false;
+    size_t contentLength = 0;
+    size_t bodyStart = 0;
     
     while ((bytesRead = Read(buffer, sizeof(buffer))) > 0) {
-        response.append(buffer, bytesRead);
+        response += std::string(buffer, bytesRead);
         
-        // Check if we've received the complete response
-        if (response.find("\r\n\r\n") != std::string::npos) {
+        // If we haven't found the content length yet, look for it
+        if (!headersComplete) {
+            size_t headerEnd = response.find("\r\n\r\n");
+            if (headerEnd != std::string::npos) {
+                headersComplete = true;
+                bodyStart = headerEnd + 4;
+                std::string headers = response.substr(0, headerEnd);
+                
+                // Find Content-Length header
+                size_t contentLengthPos = headers.find("Content-Length: ");
+                if (contentLengthPos != std::string::npos) {
+                    size_t start = contentLengthPos + 16; // Length of "Content-Length: "
+                    size_t end = headers.find("\r\n", start);
+                    std::string lengthStr = headers.substr(start, end - start);
+                    contentLength = std::stoul(lengthStr);
+                    std::cout << "[+] Content-Length: " << contentLength << std::endl;
+                }
+            }
+        }
+        
+        // If we have content length and received all data, break
+        if (headersComplete && contentLength > 0 && 
+            response.length() >= bodyStart + contentLength) {
             break;
         }
     }
-    // close the connection
+    
+    std::cout << "[+] Complete response: " << response << std::endl;
     return response;
 }
 

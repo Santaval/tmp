@@ -164,7 +164,7 @@ std::string Server::decipherRequest(char* request) {
 	httpResponse += "Content-Length: " + std::to_string(response.length()) + "\r\n";
 	httpResponse += "Connection: close\r\n";
 	httpResponse += "\r\n";
-	httpResponse += response;
+	httpResponse += response + "\r\n\r\n";
 	
 	return httpResponse;
 }
