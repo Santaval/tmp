@@ -24,7 +24,7 @@
 
 //#include <sys/types.h>
 */
-#include "VSocket.hh"
+#include "VSocket.hpp"
 
 
 /**

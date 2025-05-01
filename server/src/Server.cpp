@@ -5,12 +5,12 @@
 #include <stdexcept>
 #include <stdio.h>
 
-#include "Server.hh"
+#include "Server.hpp"
 
 Server::Server(int clientPort, const char* ip) {
 	this->clientPort = clientPort; // 5051
 	this->myAddress = ip;
-	this->fs = new FileSystem();
+	// this->fs = new FileSystem();
 	memset( &this->clientAddr, 0, sizeof( this->clientAddr ) );
 	this->clientAddr.sin_family = AF_INET;
 	this->clientAddr.sin_port = htons(this->clientPort);
@@ -101,3 +101,7 @@ std::string Server::decipherRequest(char* request) {
 	return request_str;
 }
 
+
+Server::~Server() {
+	delete this->initSocket;
+}

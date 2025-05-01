@@ -1,7 +1,7 @@
 #ifndef SSLSocket_h
 #define SSLSocket_h
 
-#include "VSocket.hh"
+#include "VSocket.hpp"
 #include <unistd.h>			// close
 // SSL includes
 #include <openssl/ssl.h>
@@ -15,19 +15,19 @@ class SSLSocket : public VSocket {
       SSLSocket(  bool serverContext, bool IPv6 = false); // Not possible to create with UDP, client constructor
       SSLSocket( char *, char *, bool = false );		// For server connections
       SSLSocket( int, SSL*);
-      ~SSLSocket();
+      ~SSLSocket() override;
       int Connect( const char *, int );
       int Connect( const char *, const char * );
-      size_t Write( const char * );
-      size_t Write( const void *, size_t );
-      size_t Read( void *, size_t );
+      size_t Write( const char * ) override;
+      size_t Write( const void *, size_t ) override;
+      size_t Read( void *, size_t ) override;
       void ShowCerts();
       const char * GetCipher();
 
       // added
       int MakeConnection( const char *, int ) override;
       int MakeConnection( const char *, const char * ) override;
-      VSocket * AcceptConnection(struct sockaddr_in* addr);
+      VSocket * AcceptConnection(struct sockaddr_in* addr) override;
 
    private:
       void Init( bool = false );		// Defaults to create a client context, true if server context needed

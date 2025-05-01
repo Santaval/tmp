@@ -15,7 +15,7 @@
 
 #include <stdexcept>
 
-#include "SSLSocket.hh"
+#include "SSLSocket.hpp"
 
 /**
   *  Class constructor

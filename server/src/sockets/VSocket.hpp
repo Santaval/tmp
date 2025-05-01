@@ -11,14 +11,18 @@
   *
  **/
 
- #ifndef VSocket_hh
- #define VSocket_hh
- #include <cstddef>
+#ifndef VSocket_hh
+#define VSocket_hh
+
+#include <cstddef>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
  
- class VSocket {
+class VSocket {
    public:
        void BuildSocket( char, bool = false );
-      ~VSocket();
+      virtual ~VSocket();
 
       void Close();
       int EstablishConnection( const char *, int );
@@ -49,4 +53,4 @@
         
 };
 
-#endif // VSocket_h
+#endif // VSocket_hh

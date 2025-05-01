@@ -1,11 +1,11 @@
-#ifndef SERVER_HH
-#define SERVER_HH
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-#include "VServer.hh"
-#include "sockets/VSocket.hh"
-#include "sockets/SSLSocket.hh"
-#include "sockets/SSLSocket.hh"
-#include "file_system/include/FileSystem.hpp"
+#include "VServer.hpp"
+#include "sockets/VSocket.hpp"
+#include "sockets/SSLSocket.hpp"
+#include "sockets/SSLSocket.hpp"
+// #include "file_system/include/FileSystem.hpp"
 class Server: public VServer {
 
   public:
@@ -36,7 +36,7 @@ class Server: public VServer {
 	private:
 
 		struct sockaddr_in clientAddr;
-		FileSystem* fs;
+		// FileSystem* fs;
 		int clientPort;
 };
 
