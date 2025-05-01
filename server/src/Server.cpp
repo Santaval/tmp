@@ -34,9 +34,7 @@ int Server::handleClientConnection(char buffer[256], VSocket* socket) {
 		}
 		
 		std::string deciphered = this->decipherRequest(const_cast<char*>(accumulatedRequest.c_str()));
-		std::cout << "[+] Deciphered request: " << deciphered << std::endl;
 		socket->sendTo(deciphered.c_str(), deciphered.length(), (void *) &this->clientAddr);
-		std::cout << "[+] Sent response to client: " << deciphered << std::endl;
 		
 		// Clear the accumulated request after processing
 		accumulatedRequest.clear();
@@ -78,7 +76,6 @@ int Server::start(const char * address) {
 
 						int bytes = newSock->recvFrom((void*)buffer, 
 							sizeof(buffer), (void *) & this->clientAddr);
-						std::cout << "[+] Received request from client: " << buffer << std::endl;
 						if ( bytes > 0) { // if not empty, manage response
 							buffer[bytes] = '\0';
 							if (this->handleClientConnection(buffer, newSock) == -1) {			
