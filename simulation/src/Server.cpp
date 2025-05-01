@@ -1,54 +1,66 @@
 #include "Server.hpp"
 #include <iostream>
 #include <fstream>
+#include <regex>
+#include <thread>
 
 int Server::run()
 {
     bool connected = true;
+
+    std::thread  discoveryThread(&Server::startDiscovery, this, discovery_buffer);
+    discoveryThread.detach();
+
     while (connected)
     {
         sem_wait(mktp_request_sem);
         std::cout << "[+] Server: recieved request from Holder: ";
-        if (this->answerMKTP() == -1) connected = false;
+        if (this->answerPIGP() == -1) connected = false;
         std::cout << "[+] Server: response sent to Holder" << std::endl;
         sem_post(mktp_response_sem);
     }
     return 0;
 }
 
-int Server::answerMKTP()
-{
+Server::~Server() {
+    discovery_buffer->write("Discovery", "BEGIN/OFF/SERVIDOR/END");
+}
+
+int Server::answerPIGP() {
+    std::string raw = this->holder_server_buffer->read("SERVER_REQUEST");
     std::string response;
-    std::string key = "ALL";
-    if (this->holder_server_buffer->contains("ONE"))
-    {
-        key = "ONE";
-        std::string file_requested = this->holder_server_buffer->read("ONE");
-        std::cout << file_requested << std::endl;
-        std::ifstream file;
-        file.open("./resources/" + file_requested);
-        if (file.is_open())
-        {
-            std::string line;
-            response += "1 ";
-            while (getline(file, line))
-            {
-                response += line + "\n";
-            }
+
+    std::smatch match;
+    std::regex getRegex(R"(BEGIN/GET/([^/]+)/END)");
+
+    if (raw == "BEGIN/OBJECTS/END") {
+        // Formato compatible con holder
+        response = "BEGIN/OK/asthetic.txt\nchillGuy.txt\nlakshmi.txt\nMichaelMouse.txt\nvalorant.txt/END";
+    } 
+    else if (std::regex_match(raw, match, getRegex)) {
+        std::string filename = match[1];
+        std::ifstream file("./resources/" + filename);
+
+        if (file.is_open()) {
+            std::string content((std::istreambuf_iterator<char>(file)), 
+                            std::istreambuf_iterator<char>());
             file.close();
-        }
-        else
-        {
-            response = "0 NF";
+            response = "BEGIN/OK/" + content + "/END";
+        } else {
+            response = "BEGIN/ERROR/201/Archivo no encontrado/END";
         }
     }
-    else
-    {   
-        std::cout << std::endl;
-        response = "1 --resources\n---asthetic.txt\n---chillGuy.txt\n---lakshmi.txt\n---MichaelMouse.txt\n---valorant.txt\n";
+    else {
+        response = "BEGIN/ERROR/300/Formato de mensaje inválido/END";
     }
 
-    this->holder_server_buffer->write(key, response);
-
+    this->holder_server_buffer->write("SERVER_RESPONSE", response);
     return 0;
+}
+
+void Server::startDiscovery(Buffer* discovery_buffer) {
+    while (true) {
+        discovery_buffer->write("DISCOVERY", "BEGIN/ON/SERVIDOR/END");
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
 }

@@ -7,6 +7,7 @@
 class Server: public Thread {
   private:
     Buffer* holder_server_buffer;
+    Buffer* discovery_buffer;
     sem_t* mktp_request_sem;
     sem_t* mktp_response_sem;
     std::string image;
@@ -19,5 +20,6 @@ class Server: public Thread {
       holder_server_buffer(holder_server_buffer), mktp_request_sem(mktp_request_sem), mktp_response_sem(mktp_response_sem) {};
     ~Server() = default;
     int run() override;
-    int answerMKTP();
+    int answerPIGP(); // PIGP = PI Group Protocol
+    void startDiscovery(Buffer* discovery_buffer);
 };
