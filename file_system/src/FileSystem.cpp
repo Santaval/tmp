@@ -1,4 +1,6 @@
 #include <iostream>
+#include <filesystem>
+#include <fstream>
 
 #include "FileSystem.hpp"
 #include "BlockOper.hpp"
@@ -10,6 +12,7 @@ FileSystem::FileSystem(const std::string& fileName)
         , bitmap(&file), dir(&file, &bitmap){
   try {
       // Try building new filesystem if loading fails
+      this->bitmap.buildBitmap();
       if (this->bitmap.loadBitMap() != 0) {
           std::cerr << "Info: Creating new filesystem\n";
           if (this->buildFileSystem() != 0) {
@@ -22,6 +25,7 @@ FileSystem::FileSystem(const std::string& fileName)
       throw std::runtime_error(std::string("Filesystem initialization failed: ") + e.what());
   }
 }
+
 
 FileSystem::~FileSystem() {
 }
@@ -181,5 +185,41 @@ int FileSystem::deleteFile(const std::string fileName) {
     }
 
     return dir.removeFile(fileName);
+}
+
+int FileSystem::loadFilesFromDirectory(const std::string& directoryPath) {
+    try {
+        // Check if directory exists
+        if (!std::filesystem::exists(directoryPath)) {
+            std::cerr << "Directory does not exist: " << directoryPath << std::endl;
+            return -1;
+        }
+
+        // Iterate through all files in the directory
+        for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+            // Check if it's a regular file and has .txt extension
+            if (entry.is_regular_file() && entry.path().extension() == ".txt") {
+                std::string fileName = entry.path().filename().string();
+                std::ifstream fileStream(entry.path());
+                
+                if (!fileStream.is_open()) {
+                    std::cerr << "Failed to open file: " << fileName << std::endl;
+                    continue;
+                }
+
+                // Add the file to the file system
+                int result = addFile(fileName, fileStream);
+                if (result != 0) {
+                    std::cerr << "Failed to add file to file system: " << fileName << std::endl;
+                }
+                
+                fileStream.close();
+            }
+        }
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading files from directory: " << e.what() << std::endl;
+        return -1;
+    }
 }
 

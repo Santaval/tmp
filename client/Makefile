@@ -1,29 +1,25 @@
-# Linux Makefile
-# Socket class with SSL
-#
+include ../common/Makefile
 
-CC  := gcc
-CXX := g++
-CFLAGS := -g -c
-CXXFLAGS := -g -c 
-LDFLAGS := -lssl -lcrypto
-DEPS := Socket.h
-TARGETS := tcp-cli.out
+LIBS += -lssl -lcrypto
 
-ALL := $(TARGETS)
-$(info $$TARGETS = $(TARGETS))
+CXX = g++
+CXXFLAGS = -std=c++11 -Wall -Wextra
+LDFLAGS = -lssl -lcrypto
 
-%.o: %.cc $(DEPS)
-	$(CXX) $(CXXFLAGS) $<
+SRCS = src/main.cpp src/Client.cpp src/Socket.cpp src/VSocket.cpp
+OBJS = $(SRCS:.cpp=.o)
+TARGET = bin/http_client
 
-%.out: %.o Socket.o
-	$(info $$^ = $^)
-	$(CXX) $^ Socket.o $(LDFLAGS) -o $^
+all: $(TARGET)
 
-tcp-cli.out: tcp-cli.o VSocket.o Socket.o SSLSocket.o
-	$(CXX) tcp-cli.o VSocket.o Socket.o SSLSocket.o $(LDFLAGS) -o $@
+$(TARGET): $(OBJS)
+	$(CXX) $(OBJS) -o $(TARGET) $(LDFLAGS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o *.out
+	rm -f $(OBJS) $(TARGET)
 
+.PHONY: all clean
 

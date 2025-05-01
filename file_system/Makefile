@@ -9,31 +9,32 @@ RELEASE_FLAGS := -O3 -DNDEBUG
 SRC_DIR := src
 INC_DIR := include
 BUILD_DIR := build
-BIN_DIR := bin
+LIB_DIR := lib
 FILES_DIR := files
 
 # Source files
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-TARGET := $(BIN_DIR)/filesystem
+LIB_NAME := libfilesystem.a
+LIB_TARGET := $(LIB_DIR)/$(LIB_NAME)
 
 # Ensure output directories exist
-$(shell mkdir -p $(BUILD_DIR) $(BIN_DIR) $(FILES_DIR))
+$(shell mkdir -p $(BUILD_DIR) $(LIB_DIR) $(FILES_DIR))
 
 # Default target (debug build)
 all: debug
 
 # Debug build
 debug: CXXFLAGS += $(DEBUG_FLAGS)
-debug: $(TARGET)
+debug: $(LIB_TARGET)
 
 # Release build
 release: CXXFLAGS += $(RELEASE_FLAGS)
-release: $(TARGET)
+release: $(LIB_TARGET)
 
-# Build main executable
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+# Build static library
+$(LIB_TARGET): $(OBJS)
+	ar rcs $@ $^
 
 # Pattern rule for object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -41,23 +42,18 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 # Clean build artifacts
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(LIB_DIR)
 
-# Run the debug program
-run: debug
-	$(TARGET)
+# Install library and headers
+install: $(LIB_TARGET)
+	@mkdir -p /usr/local/lib
+	@mkdir -p /usr/local/include/filesystem
+	cp $(LIB_TARGET) /usr/local/lib/
+	cp $(INC_DIR)/*.hpp /usr/local/include/filesystem/
 
-# Run with debugger
-debug-run: debug
-	gdb --args $(TARGET)
+# Uninstall library and headers
+uninstall:
+	rm -f /usr/local/lib/$(LIB_NAME)
+	rm -rf /usr/local/include/filesystem
 
-# Run with specific filename
-run-with: debug
-	$(TARGET) $(FILES_DIR)/custom_fs.dat
-
-# Generate assembly for inspection
-asm: CXXFLAGS += -S -fverbose-asm
-asm:
-	$(CXX) $(CXXFLAGS) $(SRC_DIR)/*.cpp
-
-.PHONY: all debug release clean run debug-run run-with asm
+.PHONY: all debug release clean install uninstall
