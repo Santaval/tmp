@@ -51,8 +51,28 @@ int id;
 			} else if (isCommand(request, "help") == 1) {
 				showHelp();
 			} else {				
+
+				const char header[] = "User-Agent: Nachos\n\n";
+				int headerLen = 0;
+				while (header[headerLen] != '\0') {
+					headerLen++;
+				}
+
+				char sendBuff[256];
+				int pos = 0;
+
+				// copy header
+				for (int i = 0; i < headerLen; ++i) {
+					sendBuff[pos++] = header[i];
+				}
+
+				// copy request
+				for (int i = 0; i < inputBytes; ++i) {
+					sendBuff[pos++] = request[i];
+				} 
+
 				// sending request to server
-				Write(request, inputBytes, id);
+				Write(sendBuff, pos, id);
 				char response[128];
 				int done = 0;
 				Write("[-] Response from Server:\n", 27, ConsoleOutput);
