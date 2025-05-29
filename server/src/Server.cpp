@@ -102,10 +102,13 @@ std::string Server::decipherRequest(char* request) {
 	std::string request_str(request);
 	std::cout << "[+] Request: " << request_str << std::endl;
 
+	// Check if this is a NachOS client request
+	bool isNachOSClient = request_str.find("Client: NachOS") != std::string::npos;
+
 	// Find the first line (request line)
 	size_t firstLineEnd = request_str.find("\r\n");
 	if (firstLineEnd == std::string::npos) {
-		return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
+		return isNachOSClient ? "Invalid request format" : "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
 	}
 	
 	std::string requestLine = request_str.substr(0, firstLineEnd);
@@ -113,13 +116,13 @@ std::string Server::decipherRequest(char* request) {
 	// Parse method and path from request line
 	size_t firstSpace = requestLine.find(" ");
 	if (firstSpace == std::string::npos) {
-		return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
+		return isNachOSClient ? "Invalid request format" : "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
 	}
 	std::string method = requestLine.substr(0, firstSpace);
 	
 	size_t secondSpace = requestLine.find(" ", firstSpace + 1);
 	if (secondSpace == std::string::npos) {
-		return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
+		return isNachOSClient ? "Invalid request format" : "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nInvalid request format";
 	}
 	std::string path = requestLine.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 	
@@ -157,7 +160,12 @@ std::string Server::decipherRequest(char* request) {
 		statusCode = 404;
 	}
 	
-	// Build HTTP response
+	// For NachOS client, return just the response content without HTTP headers
+	if (isNachOSClient) {
+		return response;
+	}
+	
+	// Build HTTP response for regular clients
 	std::string httpResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + 
 							 (statusCode == 200 ? "OK" : "Not Found") + "\r\n";
 	httpResponse += "Content-Type: " + contentType + "\r\n";
