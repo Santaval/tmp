@@ -162,7 +162,7 @@ std::string Server::decipherRequest(char* request) {
 	
 	// For NachOS client, return just the response content without HTTP headers
 	if (isNachOSClient) {
-		return response;
+		return response + "<END>";
 	}
 	
 	// Build HTTP response for regular clients
@@ -173,6 +173,7 @@ std::string Server::decipherRequest(char* request) {
 	httpResponse += "Connection: close\r\n";
 	httpResponse += "\r\n";
 	httpResponse += response + "\r\n\r\n";
+
 	
 	return httpResponse;
 }
