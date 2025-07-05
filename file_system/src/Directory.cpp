@@ -14,6 +14,16 @@ std::string Directory::getDirectory() {
   return directoryData;
 }
 
+std::string Directory::listFiles() {
+  if (this->fileList.empty()) return "No files available";
+
+  // Append dir info to a string (format) and send in return.
+  std::string directoryData;
+  for (const std::pair<std::string, uint16_t>& fileLog : this->fileList) {
+    directoryData += fileLog.first + "\n";
+  }
+  return directoryData;
+}
 uint16_t Directory::getFileBlockTable(std::string fileName) {
   for (const std::pair<std::string, uint16_t>& fileLog : this->fileList) {
     if (fileLog.first == fileName) {

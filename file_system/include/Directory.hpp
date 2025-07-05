@@ -23,6 +23,9 @@ class Directory {
   /// @brief Gets the directory in a string.
   /// @return returns the information stored in the directory.
   std::string getDirectory();
+  /// @brief Gets the list of files in the directory.
+  /// @return returns the list of files in the directory.
+  std::string listFiles();
   /// @brief Gets the number of the block with the blockTable of the file.
   /// @param fileName The name of the file to be searched
   /// @return returns the number of the block with the blockTable of the file.

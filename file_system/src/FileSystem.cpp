@@ -76,6 +76,10 @@ std::string FileSystem::getDirectory() {
   return this->dir.getDirectory();
 }
 
+std::string FileSystem::listFiles() {
+  return this->dir.listFiles();
+}
+
 int FileSystem::addFile(std::string name, std::istream& fileContent) {
   // Allocate block for the first block table
   uint16_t currentTableBlock = bitmap.allocateBlock();

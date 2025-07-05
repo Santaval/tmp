@@ -28,6 +28,9 @@ class FileSystem {
   /// @brief Gets the entries in the directory
   /// @return returns a string with available information in the directory.
   std::string getDirectory();
+  /// @brief Gets the list of files in the directory
+  /// @return returns a string with the list of files in the directory.
+  std::string listFiles();
   /// @brief Adds a file to the directory
   /// @param name The name of the file to be added
   /// @param fileContent The contents of the file

@@ -4,15 +4,20 @@
 #include "VServer.hpp"
 #include "sockets/VSocket.hpp"
 #include "sockets/SSLSocket.hpp"
+#include "./ServerBroadcastListener.hpp"
 #include "FileSystem.hpp"
+#include <thread>
+#include <atomic>
+#include <fstream>
+#include <sstream>
 
 class Server: public VServer {
 
   public:
 		/// @brief Constructor of the Server Class
 		/// @param clientPort port in which Server listens for clients
-		/// @param ip IP address of server (if local, will be "127.0.0.1")
-		Server(int clientPort, const char* ip);
+		/// @param myAddress IP address where the server is running
+		Server(int clientPort, const std::string& myAddress);
 		
 		/// @brief Destructor of Server Class
 		~Server();
@@ -21,6 +26,10 @@ class Server: public VServer {
 		/// @param address address for future connections to holder (now is equal to server ip)
 		/// @return a flag for success or failure
 		int start(const char * address) override;
+
+		void sendBroadcast(const std::string& message);
+		std::vector<std::string> getBroadcastIPs();
+		
 
 		/// @brief translates request from client, which is in HTTP
 		/// @param  char* array of the client reuqest
@@ -33,10 +42,19 @@ class Server: public VServer {
 		/// @return -1 for exit and 0 for request
 		int handleClientConnection(char buffer[256], VSocket* socket);
 
+		void stopBroadcastThread() { broadcastRunning = false; }
+		void closeListeningSocket() { if (initSocket) initSocket->Close(); }
+		std::string getMyAddress() const { return myAddress; }
+		int getClientPort() const { return clientPort; }
+
 	private:
 		struct sockaddr_in clientAddr;
 		FileSystem* fs;
 		int clientPort;
+		std::string myAddress;
+		std::thread broadcastThread;
+		ServerBroadcastListener* broadcastListener{nullptr};
+		std::atomic<bool> broadcastRunning{false};
 };
 
 #endif

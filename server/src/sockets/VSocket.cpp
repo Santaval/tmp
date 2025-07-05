@@ -63,9 +63,13 @@ void VSocket::BuildSocket( char t, bool IPv6 ){
  *
 **/
 VSocket::~VSocket() {
-
-  this->Close();
-  this->Shutdown(SHUT_RDWR);
+  try {
+    this->Close();
+    this->Shutdown(SHUT_RDWR);
+  } catch (const std::runtime_error& e) {
+    // Log the error but don't throw from destructor
+    std::cerr << "Warning: Error during socket cleanup: " << e.what() << std::endl;
+  }
 }
 
 
